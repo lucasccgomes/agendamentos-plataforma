@@ -46,7 +46,10 @@ const RegisterPage = () => {
         formData.append('bio', bio);
         formData.append('specialty', specialty);
         formData.append('phone', phone);
-        formData.append('consultationPrice', consultationPrice);
+
+        if (consultationPrice) {
+          formData.append('consultationPrice', String(Number(consultationPrice)));
+        }
       }
 
       await api.post('/users', formData, {
