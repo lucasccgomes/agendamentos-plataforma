@@ -1,0 +1,62 @@
+# =========================
+# BACKEND (NestJS)
+# =========================
+/backend/dist
+/backend/node_modules
+/backend/.env
+/backend/.env.*.local
+/backend/coverage
+/backend/.nyc_output
+
+# =========================
+# FRONTEND (Next.js)
+# =========================
+/frontend/.next
+/frontend/out
+/frontend/node_modules
+/frontend/.env
+/frontend/.env.local
+/frontend/.env.*.local
+
+# =========================
+# Shared config
+# =========================
+/node_modules
+/build
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# OS
+.DS_Store
+
+# IDEs
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Temp
+.temp
+.tmp
