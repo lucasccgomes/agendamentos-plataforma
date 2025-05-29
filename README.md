@@ -157,12 +157,6 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 
 ---
 
-## Testes
-
-> Futuro: incluir testes com Jest no backend e Cypress no frontend
-
----
-
 ## Autor
 
 **Lucas Oliveira**  
