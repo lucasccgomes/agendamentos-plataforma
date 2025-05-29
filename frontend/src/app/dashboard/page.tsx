@@ -24,12 +24,9 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
-    if (!user) {
-      router.push('/login');
-    } else {
-      fetchAppointments();
-    }
-  }, [user]);
+    fetchAppointments();
+  }, [user])
+  
 
   const fetchAppointments = async () => {
     try {
