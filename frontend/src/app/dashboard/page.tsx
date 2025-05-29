@@ -53,6 +53,10 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    console.log('Usuário carregado:', user);
+  }, [user]);
+  
 
   const formatDate = (dateString: string) => {
     try {
@@ -65,7 +69,7 @@ export default function DashboardPage() {
     } catch {
       return dateString;
     }
-  }; 
+  };
 
   if (!user) return (
     <div className="flex justify-center items-center h-screen bg-gray-50">
@@ -101,7 +105,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-center text-center">
                   <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 p-1 -mt-12 shadow-lg">
                     <img
-                      src={user.foto ? `${api.defaults.baseURL}/uploads/${user.foto}` : '/9187532.png'}
+                      src={user.photo ? `${api.defaults.baseURL}/uploads/${user.photo}` : '/9187532.png'}
                       alt="Foto de perfil"
                       className="w-full h-full object-cover rounded-full bg-white"
                     />
@@ -111,9 +115,9 @@ export default function DashboardPage() {
                     {user.role === 'profissional' ? 'Profissional' : 'Cliente'}
                   </div>
 
-                  {user.role === 'profissional' && (
+                  {user.role === 'profissional' && user.specialty && (
                     <p className="mt-3 text-sm text-gray-600">
-                      <span className="font-medium">Especialidade:</span> {user.especialidade}
+                      <span className="font-medium">Especialidade:</span> {user.specialty}
                     </p>
                   )}
 
