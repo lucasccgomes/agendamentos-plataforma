@@ -26,7 +26,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(email, password, rememberMe);
     } catch {
       setError('Login failed. Please check your credentials.');
     } finally {
