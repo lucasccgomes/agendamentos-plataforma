@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4237
+      POSTGRES_DB: agendamentos
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    restart: always
+    env_file:
+    - ./backend/.env
+    environment:
+      - DATABASE_URL=postgres://postgres:4237@postgres:5432/agendamentos
+    depends_on:
+      - postgres
+    ports:
+      - '3000:3000'
+    command: npm run start:prod
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: always
+    ports:
+      - '3001:3000'
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+
+volumes:
+  pgdata:
