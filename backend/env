@@ -1,0 +1,6 @@
+# Local
+DATABASE_URL=postgres://postgres:4237@localhost:5432/appointment
+
+# Docker
+# DATABASE_URL=postgres://postgres:postgres@postgres:5432/appointment
+DATABASE_SSL=false
