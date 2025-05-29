@@ -163,14 +163,6 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 
 ---
 
-## Em desenvolvimento
-
-- [ ] Admin dashboard
-- [ ] Notificações por e-mail
-- [ ] Filtro por especialidade
-
----
-
 ## Autor
 
 **Lucas Oliveira**  
