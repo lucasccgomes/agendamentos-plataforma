@@ -49,11 +49,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
-  useEffect(() => {
-    console.log('Usuário carregado:', user);
-  }, [user]);
-  
+  };  
 
   const formatDate = (dateString: string) => {
     try {
