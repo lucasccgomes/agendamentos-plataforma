@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsNumber, Matches } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -33,4 +33,24 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   photo?: string;
+
+  @IsOptional()
+@IsString()
+whatsapp?: string;
+
+@IsOptional()
+@Matches(/^\/[a-zA-Z0-9-_]+$/, { message: 'LinkedIn deve ser no formato /perfil' })
+linkedin?: string;
+
+@IsOptional()
+@Matches(/^\/[a-zA-Z0-9-_]+$/, { message: 'GitHub deve ser no formato /perfil' })
+github?: string;
+
+@IsOptional()
+@IsString()
+portfolio?: string;
+
 }
+
+
+

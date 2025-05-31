@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -13,8 +13,9 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
     const existingUser = await this.userRepository.findOneBy({ email: createUserDto.email });
+
     if (existingUser) {
       throw new BadRequestException('E-mail já cadastrado');
     }
@@ -24,36 +25,60 @@ export class UserService {
     const user = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
-      photo: createUserDto.photo ?? undefined
+      photo: createUserDto.photo ?? undefined,
     });
-    
 
-    return this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+    const { password, ...safeUser } = saved;
+    return safeUser;
   }
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll(): Promise<Omit<User, 'password'>[]> {
+    const users = await this.userRepository.find();
+
+    return users.map(({ password, ...safe }) => safe);
   }
 
-  findOne(id: number) {
-    return this.userRepository.findOneBy({ id });
+  async findOne(id: number): Promise<Omit<User, 'password'>> {
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    const { password, ...safeUser } = user;
+    return safeUser;
   }
 
-  findByEmail(email: string) {
+  async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOneBy({ email });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<{ message: string }> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
-    return this.userRepository.update(id, {
+
+    await this.userRepository.update(id, {
       ...updateUserDto,
-      photo: updateUserDto.photo ?? undefined
-    });    
+      photo: updateUserDto.photo ?? undefined,
+    });
+
+    return { message: 'Usuário atualizado com sucesso' };
   }
 
-  remove(id: number) {
-    return this.userRepository.delete(id);
+  async remove(id: number): Promise<{ message: string }> {
+    const result = await this.userRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return { message: 'Usuário removido com sucesso' };
   }
 }

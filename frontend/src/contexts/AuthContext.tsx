@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '../services/api';
+import { api } from '@/services/api';
 import Cookies from 'js-cookie';
 import type { User } from '@/types/types';
 
@@ -10,13 +10,19 @@ interface AuthContextData {
   user: User | null;
   token: string | null;
   loadingAuth: boolean;
-  login: (email: string, password: string, remember?: boolean) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    remember?: boolean
+  ) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -31,23 +37,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
         setToken(storedToken);
-        api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-      } catch {
+        api.defaults.headers.common[
+          'Authorization'
+        ] = `Bearer ${storedToken}`;
+      } catch (err) {
         Cookies.remove('app_token');
         Cookies.remove('app_user');
+        setUser(null);
+        setToken(null);
       }
     }
 
     setLoadingAuth(false);
   }, []);
 
-  const login = async (email: string, password: string, remember = false) => {
+  const login = async (
+    email: string,
+    password: string,
+    remember = false
+  ): Promise<void> => {
     try {
       const response = await api.post('/auth/login', { email, password });
       const { access_token, user } = response.data;
 
+      if (!access_token || !user) {
+        throw new Error('Token ou usuário ausente na resposta');
+      }
+
       setUser(user);
       setToken(access_token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
       const isProd = process.env.NODE_ENV === 'production';
 
@@ -61,9 +80,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       Cookies.set('app_token', access_token, cookieOptions);
       Cookies.set('app_user', JSON.stringify(user), cookieOptions);
 
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       router.push('/dashboard');
-    } catch {
+    } catch (error: any) {
+      console.error('Erro no login:', error?.response || error?.message);
       throw new Error('Falha ao fazer login. Verifique as credenciais.');
     }
   };
@@ -84,4 +103,4 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = (): AuthContextData => useContext(AuthContext);

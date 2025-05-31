@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Schedule } from './entities/schedule.entity';
@@ -11,40 +11,65 @@ export class ScheduleService {
   constructor(
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
+
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) { }
+  ) {}
 
-  async create(createScheduleDto: CreateScheduleDto) {
+  async create(createScheduleDto: CreateScheduleDto): Promise<Schedule> {
     const professional = await this.userRepository.findOneBy({ id: createScheduleDto.professionalId });
 
     if (!professional) {
-      throw new Error('Profissional não encontrado');
+      throw new NotFoundException('Profissional não encontrado');
     }
 
     const schedule = this.scheduleRepository.create({
       date: createScheduleDto.date,
       time: createScheduleDto.time,
       professional,
-      available: true 
-    });    
+      available: true,
+    });
 
     return this.scheduleRepository.save(schedule);
   }
 
-  findAll() {
-    return this.scheduleRepository.find({ relations: ['professional'] });
+  async findAll(): Promise<Schedule[]> {
+    return this.scheduleRepository.find({
+      relations: ['professional'],
+      order: { date: 'ASC', time: 'ASC' },
+    });
   }
 
-  findOne(id: number) {
-    return this.scheduleRepository.findOne({ where: { id }, relations: ['professional'] });
+  async findOne(id: number): Promise<Schedule> {
+    const schedule = await this.scheduleRepository.findOne({
+      where: { id },
+      relations: ['professional'],
+    });
+
+    if (!schedule) {
+      throw new NotFoundException('Horário não encontrado');
+    }
+
+    return schedule;
   }
 
-  update(id: number, updateScheduleDto: UpdateScheduleDto) {
-    return this.scheduleRepository.update(id, updateScheduleDto);
+  async update(id: number, updateScheduleDto: UpdateScheduleDto): Promise<{ message: string }> {
+    const result = await this.scheduleRepository.update(id, updateScheduleDto);
+
+    if (result.affected === 0) {
+      throw new NotFoundException('Horário não encontrado');
+    }
+
+    return { message: 'Horário atualizado com sucesso' };
   }
 
-  remove(id: number) {
-    return this.scheduleRepository.delete(id);
+  async remove(id: number): Promise<{ message: string }> {
+    const result = await this.scheduleRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException('Horário não encontrado');
+    }
+
+    return { message: 'Horário removido com sucesso' };
   }
 }

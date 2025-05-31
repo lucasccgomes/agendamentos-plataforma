@@ -28,19 +28,20 @@ export interface Schedule {
   id: number;
   date: string;
   time: string;
-  professional: Professional;
+  professional: Pick<Professional, 'id' | 'name' | 'specialty'>;
   available: boolean;
 }
 
 export interface Appointment {
   id: number;
   status: string;
-  client: Pick<Client, 'id' | 'name' | 'specialty'>;
+  createdAt: string;
+  client: Pick<Client, 'id' | 'name'>;
   schedule: {
     id: number;
     date: string;
     time: string;
-    professional: Pick<Professional, 'id' | 'name' | 'specialty' | 'phone' | 'consultationPrice'>;
+    professional: Pick<Professional, 'id' | 'name'>;
   };
 }
 
